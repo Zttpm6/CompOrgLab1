@@ -449,20 +449,96 @@ void handle_instruction()
 
 
 	        }
-	    //i statement
-	    default :{
-            //rs mask
-            uint32_t rs = (0x03E00000 & ins) >> 21;
-            //rt mask
-            uint32_t rt = (0x001F0000 & ins) >> 16;
-            //im mask
-            uint32_t im = (0x00000FFFF& ins);
+            //I-type statement
+            default :
+            {
+                //rs mask
+                uint32_t rs = (0x03E00000 & ins) >> 21;
+                //rt mask
+                uint32_t rt = (0x001F0000 & ins) >> 16;
+                //im mask
+                uint32_t im = (0x00000FFFF& ins);
 
-            printf("\n R type instruction\n"
-                  "rs : %x\n"
-                  "rt : %x\n"
-                  "im : %x\n",rs,rt,im);
-        }
+                printf("\n I-type instruction\n"
+                       "rs : %x\n"
+                       "rt : %x\n"
+                       "im : %x\n",rs,rt,im);
+                switch (opcode)
+                {
+
+                    case 0x20000000:
+                    {
+                        //ADDI
+                        puts( "ADDI" );
+                        NEXT_STATE.REGS[rt] = extend_sign(im) + CURRENT_STATE.REGS[rs];
+                        break;
+
+                    }
+                    case 0x24000000:
+                    {
+                        //ADDIU
+                        puts( "ADDIU" );
+                        NEXT_STATE.REGS[rt] = extend_sign(im) + CURRENT_STATE.REGS[rs];
+                        break;
+                    }
+                    case 0x30000000:
+                    {
+                        //ANDI
+                        puts( "ANDI" );
+                        NEXT_STATE.REGS[rt] = (im & 0x0000FFFF) & CURRENT_STATE.REGS[rs];
+                        break;
+                    }
+                    case 0x34000000:
+                    {
+                        //ORI
+                        puts( "ORI" );
+                        NEXT_STATE.REGS[rt] = (im & 0x0000FFFF) | CURRENT_STATE.REGS[rs];
+                        break;
+                    }
+                    case 0x38000000:
+                    {
+                        //XORI
+                        puts( "XORI" );
+                        NEXT_STATE.REGS[rt] = (im & 0x0000FFFF) ^ CURRENT_STATE.REGS[rs];
+                        break;
+                    }
+                        /*  case
+                          {
+                              //SLTI
+                              puts( "SLTI" )
+                              NEXT_STATE.REGS[rt] = (im & 0x0000FFFF) ^ CURRENT_STATE.REGS[rs];
+                          }*/
+                    case 0x8C000000:
+                    {
+                        //load word
+                        puts("LOAD WORD");
+                        uint32_t offset = extend_sign( im );
+                        uint32_t eAddr = offset + CURRENT_STATE.REGS[rs];
+                        NEXT_STATE.REGS[rt] = mem_read_32( eAddr );
+                        break;
+                    }
+                    case 0x80000000:
+                    {
+                        //Load Byte
+                        puts("Load Byte" );
+                        uint32_t offset = extend_sign( im );
+                        uint32_t eAddr = offset + CURRENT_STATE.REGS[rs];
+                        NEXT_STATE.REGS[rt] = 0x0000000F | mem_read_32( eAddr );
+                        break;
+
+                    }
+                    case 0x84000000:
+                    {
+                        //Load Byte
+                        puts("Load Halfword" );
+                        uint32_t offset = extend_sign( im );
+                        uint32_t eAddr = offset + CURRENT_STATE.REGS[rs];
+                        NEXT_STATE.REGS[rt] = 0x000000FF | mem_read_32( eAddr );
+                        break;
+                    }
+
+                }
+            }
 
         }
 	}

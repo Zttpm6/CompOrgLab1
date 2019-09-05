@@ -10,12 +10,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="44e9d78a-39b3-4c34-a983-15ef837fe399" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test1.in" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test2.in" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test3.in" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/mu-mips" beforeDir="false" afterPath="$PROJECT_DIR$/src/mu-mips" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/mu-mips.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/mu-mips.c" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -68,6 +63,7 @@
       <option name="presentableId" value="Default" />
       <updated>1567714631971</updated>
       <workItem from="1567714634440" duration="8901000" />
+      <workItem from="1567724332152" duration="22000" />
     </task>
     <servers />
   </component>
@@ -79,7 +75,9 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
           </value>
         </entry>
       </map>

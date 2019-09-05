@@ -4,12 +4,15 @@
 #include <stdint.h>
 #include <assert.h>
 
+uint32_t prevInstruction;
+
 #include "mu-mips.h"
 
 /***************************************************************/
 /* Print out a list of commands available                                                                  */
 /***************************************************************/
-void help() {        
+void help()
+{        
 	printf("------------------------------------------------------------------\n\n");
 	printf("\t**********MU-MIPS Help MENU**********\n\n");
 	printf("sim\t-- simulate program to completion \n");
@@ -59,7 +62,7 @@ void mem_write_32(uint32_t address, uint32_t value)
 			MEM_REGIONS[i].mem[offset+2] = (value >> 16) & 0xFF;
 			MEM_REGIONS[i].mem[offset+1] = (value >>  8) & 0xFF;
 			MEM_REGIONS[i].mem[offset+0] = (value >>  0) & 0xFF;
-		}C does not and nev
+		}
 	}
 }
 
@@ -99,11 +102,12 @@ void run(int num_cycles) {
 void runAll() {                                                     
 	if (RUN_FLAG == FALSE) {
 		printf("Simulation Stopped.\n\n");
-		return;C does not and nev
+		return;
 	}
 
 	printf("Simulation Started...\n\n");
-	while (RUN_FLAG){
+	while (RUN_FLAG)
+        {
 		cycle();
 	}
 	printf("Simulation Finished.\n\n");
@@ -314,9 +318,11 @@ void handle_instruction()
 
 	uint32_t jump = 0x4;
 	printf("\nOpcode: %0x8\n", opcode);
-	switch (opcode){
+	switch (opcode)
+        {
 	    //R statement
-	    case 0x00000000:{
+	    case 0x00000000:
+            {
 	        //rs mask
 	        uint32_t rs = (0x03E00000 & ins) >> 21;
 	        //rt mask
@@ -328,29 +334,104 @@ void handle_instruction()
 	        //func mask
 	        uint32_t func = (0x0000003F & ins);
 
-	        print("\n R type instruction\n"
+	        printf("\n R-type instruction\n"
                "rs : %x\n"
                "rt : %x\n"
                "rd : %x\n"
                "sa : %x\n"
                "func : %x\n", rs,rt,rd,sa,func);
 	    }
-	    //i statement
-	    case default :{
-            //rs mask
-            uint32_t rs = (0x03E00000 & ins) >> 21;
-            //rt mask
-            uint32_t rt = (0x001F0000 & ins) >> 16;
-            //im mask
-            uint32_t im = (0x00000FFFF& ins);
+	    
+	    //I-type statement
+	    default :
+            {
+                //rs mask
+                uint32_t rs = (0x03E00000 & ins) >> 21;
+                //rt mask
+                uint32_t rt = (0x001F0000 & ins) >> 16;
+                //im mask
+                uint32_t im = (0x00000FFFF& ins);
 
-            print("\n R type instruction\n"
-                  "rs : %x\n"
-                  "rt : %x\n"
-                  "im : %x\n",rs,rt,im);
-        }
-
-        }
+                printf("\n I-type instruction\n"
+                    "rs : %x\n"
+                    "rt : %x\n"
+                    "im : %x\n",rs,rt,im);
+            switch (opcode)
+            {
+        
+            case 0x20000000:
+                {
+                    //ADDI
+                    puts( "ADDI" );
+                    NEXT_STATE.REGS[rt] = extend_sign(im) + CURRENT_STATE.REGS[rs];
+                    break;
+                
+                }
+                case 0x24000000:
+                {
+                    //ADDIU
+                    puts( "ADDIU" );
+                    NEXT_STATE.REGS[rt] = extend_sign(im) + CURRENT_STATE.REGS[rs];
+                    break;
+                }
+                case 0x30000000:
+                {
+                    //ANDI
+                    puts( "ANDI" );
+                    NEXT_STATE.REGS[rt] = (im & 0x0000FFFF) & CURRENT_STATE.REGS[rs];
+                    break;
+                }
+                case 0x34000000:
+                {
+                    //ORI
+                    puts( "ORI" );
+                    NEXT_STATE.REGS[rt] = (im & 0x0000FFFF) | CURRENT_STATE.REGS[rs];
+                    break;
+                }
+                case 0x38000000:
+                {
+                    //XORI
+                    puts( "XORI" );
+                    NEXT_STATE.REGS[rt] = (im & 0x0000FFFF) ^ CURRENT_STATE.REGS[rs];
+                    break;
+                }
+              /*  case
+                {
+                    //SLTI
+                    puts( "SLTI" )
+                    NEXT_STATE.REGS[rt] = (im & 0x0000FFFF) ^ CURRENT_STATE.REGS[rs];
+                }*/
+                case 0x8C000000:
+                {
+                  //load word
+                  puts("LOAD WORD");
+                  uint32_t offset = extend_sign( im );
+                  uint32_t eAddr = offset + CURRENT_STATE.REGS[rs];
+                  NEXT_STATE.REGS[rt] = mem_read_32( eAddr );
+                  break;
+                }
+                case 0x80000000:
+                {
+                  //Load Byte
+                  puts("Load Byte" );
+                  uint32_t offset = extend_sign( im );
+                  uint32_t eAddr = offset + CURRENT_STATE.REGS[rs];
+                  NEXT_STATE.REGS[rt] = 0x0000000F | mem_read_32( eAddr );
+                  break;
+                  
+                }
+                case 0x84000000:
+                {
+                //Load Byte
+                    puts("Load Halfword" );
+                    uint32_t offset = extend_sign( im );
+                    uint32_t eAddr = offset + CURRENT_STATE.REGS[rs];
+                    NEXT_STATE.REGS[rt] = 0x000000FF | mem_read_32( eAddr );
+                    break;   
+                }
+                
+            }
+           }
 	}
 
 }
@@ -390,7 +471,8 @@ void print_instruction(uint32_t addr){
 /***************************************************************/
 /* main                                                                                                                                   */
 /***************************************************************/
-int main(int argc, char *argv[]) {                              
+int main(int argc, char *argv[]) 
+{                              
 	printf("\n**************************\n");
 	printf("Welcome to MU-MIPS SIM...\n");
 	printf("**************************\n\n");
@@ -404,7 +486,8 @@ int main(int argc, char *argv[]) {
 	initialize();
 	load_program();
 	help();
-	while (1){
+	while (1)
+        {
 		handle_command();
 	}
 	return 0;

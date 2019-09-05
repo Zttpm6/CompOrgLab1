@@ -4,15 +4,12 @@
 #include <stdint.h>
 #include <assert.h>
 
-uint32_t prevInstruction;
-
 #include "mu-mips.h"
 
 /***************************************************************/
 /* Print out a list of commands available                                                                  */
 /***************************************************************/
-void help()
-{        
+void help() {        
 	printf("------------------------------------------------------------------\n\n");
 	printf("\t**********MU-MIPS Help MENU**********\n\n");
 	printf("sim\t-- simulate program to completion \n");
@@ -106,8 +103,7 @@ void runAll() {
 	}
 
 	printf("Simulation Started...\n\n");
-	while (RUN_FLAG)
-        {
+	while (RUN_FLAG){
 		cycle();
 	}
 	printf("Simulation Finished.\n\n");
@@ -318,11 +314,9 @@ void handle_instruction()
 
 	uint32_t jump = 0x4;
 	printf("\nOpcode: %0x8\n", opcode);
-	switch (opcode)
-        {
+	switch (opcode){
 	    //R statement
-	    case 0x00000000:
-            {
+	    case 0x00000000:{
 	        //rs mask
 	        uint32_t rs = (0x03E00000 & ins) >> 21;
 	        //rt mask
@@ -334,104 +328,143 @@ void handle_instruction()
 	        //func mask
 	        uint32_t func = (0x0000003F & ins);
 
-	        printf("\n R-type instruction\n"
+	        printf("\n R type instruction\n"
                "rs : %x\n"
                "rt : %x\n"
                "rd : %x\n"
                "sa : %x\n"
                "func : %x\n", rs,rt,rd,sa,func);
-	    }
-	    
-	    //I-type statement
-	    default :
-            {
-                //rs mask
-                uint32_t rs = (0x03E00000 & ins) >> 21;
-                //rt mask
-                uint32_t rt = (0x001F0000 & ins) >> 16;
-                //im mask
-                uint32_t im = (0x00000FFFF& ins);
+	        switch(func){
+	            //Add
+                case 0x00000020:{
+                    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rs] + CURRENT_STATE.REGS[rt];
+                    break;
 
-                printf("\n I-type instruction\n"
-                    "rs : %x\n"
-                    "rt : %x\n"
-                    "im : %x\n",rs,rt,im);
-            switch (opcode)
-            {
-        
-            case 0x20000000:
-                {
-                    //ADDI
-                    puts( "ADDI" );
-                    NEXT_STATE.REGS[rt] = extend_sign(im) + CURRENT_STATE.REGS[rs];
+                }
+                //ADDU add unsigned
+	            case 0x00000021:{
+                    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rs] + CURRENT_STATE.REGS[rt];
                     break;
-                
-                }
-                case 0x24000000:
-                {
-                    //ADDIU
-                    puts( "ADDIU" );
-                    NEXT_STATE.REGS[rt] = extend_sign(im) + CURRENT_STATE.REGS[rs];
+	            }
+	            //Sub
+	            case 0x00000022:{
+	                NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rs] - CURRENT_STATE.REGS[rt];
+	                break;
+	            }
+	            //Subu
+	            case 0x00000023:{
+                    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rs] - CURRENT_STATE.REGS[rt];
+                    break;
+	            }
+	            //MUlT
+	            case 0x00000018:{
+
+	                break;
+	            }
+	            //Multu
+	            case 0x00000019:{
+
+	                break;
+	            }
+	            //AND
+	            case 0x00000024:{
+                    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rs] & CURRENT_STATE.REGS[rt];
+                    break;
+	            }
+	            //or
+	            case 0x00000025:{
+
+                    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rs] || CURRENT_STATE.REGS[rt];
+	                break;
+	            }
+	            //xor
+	            case 0x00000026:{
+                    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rs] ^ CURRENT_STATE.REGS[rt];
+                    break;
+	            }
+	            //NOR
+	            case 0x00000027:{
+	                NEXT_STATE.REGS[rd] = ~(CURRENT_STATE.REGS[rs] | CURRENT_STATE.REGS[rt]);
+	                break;
+	            }
+	            //SLT
+	            case 0x0000002A:{
+	                if(CURRENT_STATE.REGS[rs] < CURRENT_STATE.REGS[rt]){
+	                    NEXT_STATE.REGS[rd] = 0x00000001;
+	                }
+	                else{
+                        NEXT_STATE.REGS[rd] = 0x00000000;
+	                }
+	                break;
+	            }
+	            //SLL
+	            case 0x00000000:{
+	                uint32_t temp = CURRENT_STATE.REGS[rt] << sa;
+	                NEXT_STATE.REGS[rd] = temp;
+	                break;
+	            }
+	            //SRL
+                case 0x00000002:{
+                    uint32_t temp = CURRENT_STATE.REGS[rt] >> sa;
+                    NEXT_STATE.REGS[rd] = temp;
                     break;
                 }
-                case 0x30000000:
-                {
-                    //ANDI
-                    puts( "ANDI" );
-                    NEXT_STATE.REGS[rt] = (im & 0x0000FFFF) & CURRENT_STATE.REGS[rs];
+	            //SRA
+	            //JR
+                case 0x00000008:{
+                    uint32_t temp = CURRENT_STATE.REGS[rs];
+                    jump = temp - CURRENT_STATE.PC;
                     break;
                 }
-                case 0x34000000:
-                {
-                    //ORI
-                    puts( "ORI" );
-                    NEXT_STATE.REGS[rt] = (im & 0x0000FFFF) | CURRENT_STATE.REGS[rs];
+	            //JALR
+                case 0x00000009:{
+                    uint32_t temp = CURRENT_STATE.REGS[rs];
+                    NEXT_STATE.REGS[rd] = CURRENT_STATE.PC + 0x8;
+                    jump = temp - CURRENT_STATE.PC;
                     break;
                 }
-                case 0x38000000:
-                {
-                    //XORI
-                    puts( "XORI" );
-                    NEXT_STATE.REGS[rt] = (im & 0x0000FFFF) ^ CURRENT_STATE.REGS[rs];
+	            //MTLO
+                case 0x00000013:{
+                    NEXT_STATE.LO = CURRENT_STATE.REGS[rs];
                     break;
                 }
-              /*  case
-                {
-                    //SLTI
-                    puts( "SLTI" )
-                    NEXT_STATE.REGS[rt] = (im & 0x0000FFFF) ^ CURRENT_STATE.REGS[rs];
-                }*/
-                case 0x8C000000:
-                {
-                  //load word
-                  puts("LOAD WORD");
-                  uint32_t offset = extend_sign( im );
-                  uint32_t eAddr = offset + CURRENT_STATE.REGS[rs];
-                  NEXT_STATE.REGS[rt] = mem_read_32( eAddr );
-                  break;
+	            //MTHI
+                case 0x00000011:{
+                    NEXT_STATE.HI = CURRENT_STATE.REGS[rs];
+                    break;
                 }
-                case 0x80000000:
-                {
-                  //Load Byte
-                  puts("Load Byte" );
-                  uint32_t offset = extend_sign( im );
-                  uint32_t eAddr = offset + CURRENT_STATE.REGS[rs];
-                  NEXT_STATE.REGS[rt] = 0x0000000F | mem_read_32( eAddr );
-                  break;
-                  
+	            //MFLO
+                case 0x00000012:{
+                    NEXT_STATE.REGS[rd] = CURRENT_STATE.LO;
+                    break;
                 }
-                case 0x84000000:
-                {
-                //Load Byte
-                    puts("Load Halfword" );
-                    uint32_t offset = extend_sign( im );
-                    uint32_t eAddr = offset + CURRENT_STATE.REGS[rs];
-                    NEXT_STATE.REGS[rt] = 0x000000FF | mem_read_32( eAddr );
-                    break;   
+	            //MFHI
+                case 0x00000010:{
+                    NEXT_STATE.REGS[rd] = CURRENT_STATE.HI;
+                    break;
                 }
-                
-            }
-           }
+	            //SYSCALL
+	            //DIV
+	            //DIVU
+
+
+	        }
+	    //i statement
+	    default :{
+            //rs mask
+            uint32_t rs = (0x03E00000 & ins) >> 21;
+            //rt mask
+            uint32_t rt = (0x001F0000 & ins) >> 16;
+            //im mask
+            uint32_t im = (0x00000FFFF& ins);
+
+            printf("\n R type instruction\n"
+                  "rs : %x\n"
+                  "rt : %x\n"
+                  "im : %x\n",rs,rt,im);
+        }
+
+        }
 	}
 
 }
@@ -471,8 +504,7 @@ void print_instruction(uint32_t addr){
 /***************************************************************/
 /* main                                                                                                                                   */
 /***************************************************************/
-int main(int argc, char *argv[]) 
-{                              
+int main(int argc, char *argv[]) {                              
 	printf("\n**************************\n");
 	printf("Welcome to MU-MIPS SIM...\n");
 	printf("**************************\n\n");
@@ -486,8 +518,7 @@ int main(int argc, char *argv[])
 	initialize();
 	load_program();
 	help();
-	while (1)
-        {
+	while (1){
 		handle_command();
 	}
 	return 0;

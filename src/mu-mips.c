@@ -6,6 +6,19 @@
 
 #include "mu-mips.h"
 
+
+uint32_t extend_sign( uint32_t im )
+{
+	uint32_t data = ( im & 0x0000FFFF );
+	uint32_t mask = 0x00008000;
+	if ( mask & data ) 
+	{
+		data = data | 0xFFFF0000;
+	}
+
+	return data;
+}
+
 /***************************************************************/
 /* Print out a list of commands available                                                                  */
 /***************************************************************/
@@ -311,10 +324,12 @@ void handle_instruction()
 	uint32_t ins = mem_read_32(CURRENT_STATE.PC);
 	printf("\nInstruction: %08x \n", ins);
 	uint32_t opcode = (0xFC000000 & ins);
-
 	uint32_t jump = 0x4;
+	
+	
 	printf("\nOpcode: %0x8\n", opcode);
-	switch (opcode){
+	switch (opcode)
+	{
 	    //R statement
 	    case 0x00000000:{
 	        //rs mask
@@ -447,8 +462,8 @@ void handle_instruction()
 	            //DIV
 	            //DIVU
 
-
 	        }
+			
             //I-type statement
             default :
             {
@@ -463,6 +478,7 @@ void handle_instruction()
                        "rs : %x\n"
                        "rt : %x\n"
                        "im : %x\n",rs,rt,im);
+					   
                 switch (opcode)
                 {
 
@@ -529,14 +545,81 @@ void handle_instruction()
                     }
                     case 0x84000000:
                     {
-                        //Load Byte
+                        //Load Halfword
                         puts("Load Halfword" );
                         uint32_t offset = extend_sign( im );
                         uint32_t eAddr = offset + CURRENT_STATE.REGS[rs];
                         NEXT_STATE.REGS[rt] = 0x000000FF | mem_read_32( eAddr );
                         break;
                     }
-
+					case 0x3C000000:
+                    {
+                        //Load Upper Immediate
+                        puts("Load Upper Immediate" );
+                        NEXT_STATE.REGS[rt] = (im << 16);
+                        break;
+                    }
+					case 0xAC000000:
+                    {
+                        //Store word
+                        puts("store word" );
+						uint32_t offset = extend_sign( im );
+						uint32_t eAddr = offset + CURRENT_STATE.REGS[rs];
+                        mem_write_32( eAddr, CURRENT_STATE.REGS[rt] );
+                        break;
+                    }
+					case 0xA000000:
+					{
+						//Store byte
+                        puts("Store byte" );
+						uint32_t offset = extend_sign( im );
+						uint32_t eAddr = offset + CURRENT_STATE.REGS[rs];
+                        mem_write_32( eAddr, CURRENT_STATE.REGS[rt] );
+                        break;
+					}
+					case 0xA4000000:
+					{
+						//Store Halfwood
+						puts("Store Halfwood" );
+						uint32_t offset = extend_sign( im );
+						uint32_t eAddr = offset + CURRENT_STATE.REGS[rs];
+                        mem_write_32( eAddr, CURRENT_STATE.REGS[rt] );
+                        break;
+					}
+					case 0x14000000:
+					{
+						//Branch on Not Equal
+						puts("Branch on Not Equal" );
+						uint32_t tar = extend_sign( im ) << 2;
+						if( CURRENT_STATE.REGS[rs] != CURRENT_STATE.REGS[rt] )
+						{
+							jump = tar;
+						}
+                        break;
+					}
+					case 0x18000000:
+					{
+						//Branch on Less Than or Equal to Zero
+						puts("Branch on Less Than or Equal to Zero" );
+						uint32_t tar = extend_sign( im ) << 2;
+						if( ( CURRENT_STATE.REGS[rs] & 0x80000000 ) || ( CURRENT_STATE.REGS[rt] == 0 ) )
+						{
+							jump = tar;
+						}
+                        break;
+					}
+					case 0x1C000000:
+					{
+						//Branch on Greater Than Zero
+						puts("Branch on Greater Than Zero" );
+						uint32_t tar = extend_sign( im ) << 2;
+						if( !( CURRENT_STATE.REGS[rs] & 0x80000000 ) || ( CURRENT_STATE.REGS[rt] != 0 ) )
+						{
+							jump = tar;
+						}
+						break;
+					}
+					// J 
                 }
             }
 

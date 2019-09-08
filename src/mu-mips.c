@@ -5,6 +5,7 @@
 #include <assert.h>
 
 #include "mu-mips.h"
+uint32_t prevInstruction;
 
 
 uint32_t extend_sign( uint32_t im )
@@ -375,13 +376,61 @@ void handle_instruction()
 	            //MUlT
 	            case 0x00000018:{
 
-	                break;
+                    if(prevInstruction == 0x0000012 || prevInstruction == 0x0000011)
+                    {
+                        puts("Result is undefined");
+                        break;
+                    }
+                    uint64_t tempResult = CURRENT_STATE.REGS[rs] * CURRENT_STATE.REGS[rt];
+
+                    NEXT_STATE.LO = tempResult & 0xFFFFFFFF; //get low 32-bits
+                    NEXT_STATE.HI = tempResult >> 32; //get high 32-bits
+                    break;
 	            }
 	            //Multu
 	            case 0x00000019:{
 
+
+                    //if either of the 2 preceding instructions were MFLO or MFHI, result is undefined
+                    if(prevInstruction == 0x0000012 || prevInstruction == 0x0000011)
+                    {
+                        puts("Result is undefined");
+                        break;
+                    }
+
+                    uint64_t tempResult = CURRENT_STATE.REGS[rs] * CURRENT_STATE.REGS[rt];
+
+                    NEXT_STATE.LO = tempResult & 0xFFFFFFFF; //get low 32-bits
+                    NEXT_STATE.HI = tempResult >> 32; //get high 32-bits
 	                break;
 	            }
+                    //DIV
+                case 0x0000001A: {
+
+                    //if either of the 2 preceding instructions were MFLO or MFHI, result is undefined
+                    if (prevInstruction == 0x0000012 || prevInstruction == 0x0000011 || CURRENT_STATE.REGS[rt] == 0) {
+                        puts("Result is undefined");
+                        break;
+                    }
+
+                    NEXT_STATE.LO = CURRENT_STATE.REGS[rs] / CURRENT_STATE.REGS[rt]; //get quotient
+                    NEXT_STATE.HI = CURRENT_STATE.REGS[rs] % CURRENT_STATE.REGS[rt];  //get remainder
+                    break;
+                }
+                //DIVU
+                case 0x0000001B: {
+
+
+                    //if either of the 2 preceding instructions were MFLO or MFHI, result is undefined
+                    if (prevInstruction == 0x0000012 || prevInstruction == 0x0000011 || CURRENT_STATE.REGS[rt] == 0) {
+                        puts("Result is undefined");
+                        break;
+                    }
+
+                    NEXT_STATE.LO = CURRENT_STATE.REGS[rs] / CURRENT_STATE.REGS[rt]; //get quotient
+                    NEXT_STATE.HI = CURRENT_STATE.REGS[rs] % CURRENT_STATE.REGS[rt];  //get remainder
+                    break;
+                }
 	            //AND
 	            case 0x00000024:{
                     NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rs] & CURRENT_STATE.REGS[rt];
@@ -426,8 +475,27 @@ void handle_instruction()
                     break;
                 }
 	            //SRA
+                case 0x00000003:
+                {
+                    uint32_t temp;
+                    int x;
+                    uint32_t hiBit = CURRENT_STATE.REGS[rt] & 0x80000000;
+                    if(hiBit == 1)
+                    {
+                        temp = CURRENT_STATE.REGS[rt];
+                        for( x = 0; x < sa; x++ )
+                        {
+                            temp = ((temp >> 1) | 0x80000000);
+                        }
+                    }
+                    else
+                    {
+                        temp = CURRENT_STATE.REGS[rt] >> sa;
+                    }
+                    NEXT_STATE.REGS[rd] = temp;
+                    break;
+                }
 	            //JR
-				//J
                 case 0x00000008:{
                     uint32_t temp = CURRENT_STATE.REGS[rs];
                     jump = temp - CURRENT_STATE.PC;
@@ -461,7 +529,13 @@ void handle_instruction()
                     break;
                 }
 	            //SYSCALL
-	        }
+                case 0x0000000C:
+                    //SYSCALL - System Call, exit the program.
+                    NEXT_STATE.REGS[0] = 0xA;
+                    puts( "Terminate" );
+                    RUN_FLAG = FALSE;
+                    break;
+            }
 			
 		}
 				

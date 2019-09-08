@@ -529,12 +529,13 @@ void handle_instruction()
                     break;
                 }
 	            //SYSCALL
-                case 0x0000000C:
+                case 0x0000000C: {
                     //SYSCALL - System Call, exit the program.
                     NEXT_STATE.REGS[0] = 0xA;
-                    puts( "Terminate" );
+                    puts("Terminate");
                     RUN_FLAG = FALSE;
                     break;
+                }
             }
 			
 		}

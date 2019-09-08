@@ -350,7 +350,8 @@ void handle_instruction()
                "rd : %x\n"
                "sa : %x\n"
                "func : %x\n", rs,rt,rd,sa,func);
-	        switch(func){
+	        switch(func)
+			{
 	            //Add
                 case 0x00000020:{
                     NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rs] + CURRENT_STATE.REGS[rt];
@@ -427,6 +428,7 @@ void handle_instruction()
                 }
 	            //SRA
 	            //JR
+				//J
                 case 0x00000008:{
                     uint32_t temp = CURRENT_STATE.REGS[rs];
                     jump = temp - CURRENT_STATE.PC;
@@ -460,16 +462,10 @@ void handle_instruction()
                     break;
                 }
 	            //SYSCALL
-	            //DIV
-	            //DIVU
-				
-				break;
-
 	        }
 			
 		}
-			
-			
+				
         //I-type statement
         default :
         {
@@ -487,7 +483,6 @@ void handle_instruction()
 				   
             switch (opcode)
             {
-
                 case 0x20000000:
                 {
                     //ADDI
@@ -524,16 +519,23 @@ void handle_instruction()
                     NEXT_STATE.REGS[rt] = (im & 0x0000FFFF) ^ CURRENT_STATE.REGS[rs];
                     break;
                 }
-                    /*  case
-                      {
-                          //SLTI
-                          puts( "SLTI" )
-                          NEXT_STATE.REGS[rt] = (im & 0x0000FFFF) ^ CURRENT_STATE.REGS[rs];
-                      }*/
+                case 0x28000000:
+                {
+                    //Set On Less Than Immediate
+                    puts("SLTI");
+					if(CURRENT_STATE.REGS[rs] < extend_sign(im))
+					{
+						NEXT_STATE.REGS[rt] = 1;
+					}
+					else
+					{
+						NEXT_STATE.REGS[rt] = 0;
+					}
+                }
                 case 0x8C000000:
                 {
                     //load word
-                    puts("LOAD WORD");
+                    puts("LW");
                     uint32_t offset = extend_sign( im );
                     uint32_t eAddr = offset + CURRENT_STATE.REGS[rs];
                     NEXT_STATE.REGS[rt] = mem_read_32( eAddr );
@@ -542,7 +544,7 @@ void handle_instruction()
                 case 0x80000000:
                 {
                     //Load Byte
-                    puts("Load Byte" );
+                    puts("LB");
                     uint32_t offset = extend_sign( im );
                     uint32_t eAddr = offset + CURRENT_STATE.REGS[rs];
                     NEXT_STATE.REGS[rt] = 0x0000000F | mem_read_32( eAddr );
@@ -552,7 +554,7 @@ void handle_instruction()
                 case 0x84000000:
                 {
                     //Load Halfword
-                    puts("Load Halfword" );
+                    puts("LH");
                     uint32_t offset = extend_sign( im );
                     uint32_t eAddr = offset + CURRENT_STATE.REGS[rs];
                     NEXT_STATE.REGS[rt] = 0x000000FF | mem_read_32( eAddr );
@@ -561,14 +563,14 @@ void handle_instruction()
 				case 0x3C000000:
                 {
                     //Load Upper Immediate
-                    puts("Load Upper Immediate" );
+                    puts("LUI");
                     NEXT_STATE.REGS[rt] = (im << 16);
                     break;
                 }
 				case 0xAC000000:
                 {
                     //Store word
-                    puts("store word" );
+                    puts("SW");
 					uint32_t offset = extend_sign( im );
 					uint32_t eAddr = offset + CURRENT_STATE.REGS[rs];
                     mem_write_32( eAddr, CURRENT_STATE.REGS[rt] );
@@ -577,7 +579,7 @@ void handle_instruction()
 				case 0xA000000:
 				{
 					//Store byte
-                    puts("Store byte" );
+                    puts("SB");
 					uint32_t offset = extend_sign( im );
 					uint32_t eAddr = offset + CURRENT_STATE.REGS[rs];
                     mem_write_32( eAddr, CURRENT_STATE.REGS[rt] );
@@ -586,16 +588,21 @@ void handle_instruction()
 				case 0xA4000000:
 				{
 					//Store Halfwood
-					puts("Store Halfwood" );
+					puts("SH");
 					uint32_t offset = extend_sign( im );
 					uint32_t eAddr = offset + CURRENT_STATE.REGS[rs];
                     mem_write_32( eAddr, CURRENT_STATE.REGS[rt] );
                     break;
 				}
+				case 0x10000000:
+				{
+					//help
+					break;
+				}
 				case 0x14000000:
 				{
 					//Branch on Not Equal
-					puts("Branch on Not Equal" );
+					puts("BNE");
 					uint32_t tar = extend_sign( im ) << 2;
 					if( CURRENT_STATE.REGS[rs] != CURRENT_STATE.REGS[rt] )
 					{
@@ -606,7 +613,7 @@ void handle_instruction()
 				case 0x18000000:
 				{
 					//Branch on Less Than or Equal to Zero
-					puts("Branch on Less Than or Equal to Zero" );
+					puts("BLEZ");
 					uint32_t tar = extend_sign( im ) << 2;
 					if( ( CURRENT_STATE.REGS[rs] & 0x80000000 ) || ( CURRENT_STATE.REGS[rt] == 0 ) )
 					{
@@ -617,7 +624,7 @@ void handle_instruction()
 				case 0x1C000000:
 				{
 					//Branch on Greater Than Zero
-					puts("Branch on Greater Than Zero" );
+					puts("BGTZ");
 					uint32_t tar = extend_sign( im ) << 2;
 					if( !( CURRENT_STATE.REGS[rs] & 0x80000000 ) || ( CURRENT_STATE.REGS[rt] != 0 ) )
 					{
@@ -625,9 +632,35 @@ void handle_instruction()
 					}
 					break;
 				}
-				// J 
+				case 0x04000000:
+				{
+					//REGIMM
+					switch(rt)
+					{
+						case 0x00000000:
+						{
+							//Branch On Less Than Zer0
+							puts("BLTZ");
+							uint32_t tar = ( extend_sign( im ) << 2 );
+							if( ( CURRENT_STATE.REGS[rs] & 0x80000000 ) )
+							{
+								jump = tar;
+							}
+							break;
+						}
+						case 0x00000001:
+						{
+							//BGEZ - Branch on Greater Than or Equal to Zero
+							uint32_t tar = ( extend_sign( im ) << 2 );
+							if( !( CURRENT_STATE.REGS[rs] & 0x80000000 ) )
+							{
+								jump = tar;
+							}
+							break;
+						}
+					}
+				}
             }
-			
 			break;
         }
 	}

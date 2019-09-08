@@ -12,10 +12,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="44e9d78a-39b3-4c34-a983-15ef837fe399" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/mu-mips-v1.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/mu-mips-v1.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/mu-mips.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/mu-mips.c" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
@@ -34,8 +30,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/mu-mips.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="623">
-              <caret line="537" column="13" lean-forward="true" selection-start-line="537" selection-start-column="13" selection-end-line="537" selection-end-column="13" />
+            <state relative-caret-position="-470">
+              <caret line="821" column="42" selection-start-line="821" selection-start-column="42" selection-end-line="821" selection-end-column="42" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -131,23 +127,23 @@
       <updated>1567714631971</updated>
       <workItem from="1567714634440" duration="8901000" />
       <workItem from="1567724332152" duration="22000" />
-      <workItem from="1567979850610" duration="368000" />
+      <workItem from="1567979850610" duration="840000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="368000" />
+    <option name="totallyTimeSpent" value="840000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="2062" height="1126" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Favorites" side_tool="true" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24975026" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24975026" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Database Changes" />
       <window_info anchor="bottom" id="Version Control" />
-      <window_info anchor="bottom" id="Terminal" />
+      <window_info active="true" anchor="bottom" id="Terminal" visible="true" weight="0.32997987" />
       <window_info anchor="bottom" id="Event Log" side_tool="true" />
       <window_info anchor="bottom" id="CMake" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -205,8 +201,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/mu-mips.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="623">
-          <caret line="537" column="13" lean-forward="true" selection-start-line="537" selection-start-column="13" selection-end-line="537" selection-end-column="13" />
+        <state relative-caret-position="-470">
+          <caret line="821" column="42" selection-start-line="821" selection-start-column="42" selection-end-line="821" selection-end-column="42" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>

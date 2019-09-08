@@ -326,7 +326,6 @@ void handle_instruction()
 	uint32_t opcode = (0xFC000000 & ins);
 	uint32_t jump = 0x4;
 	
-	
 	printf("\nOpcode: %0x8\n", opcode);
 	switch (opcode)
 	{
@@ -596,7 +595,12 @@ void handle_instruction()
 				}
 				case 0x10000000:
 				{
-					//help
+					//BEQ
+					uint32_t tar = extend_sign( im ) << 2;
+					if( CURRENT_STATE.REGS[rs] == CURRENT_STATE.REGS[rt] )
+					{
+						jump = tar;
+					}
 					break;
 				}
 				case 0x14000000:
@@ -696,8 +700,166 @@ void print_program(){
 /************************************************************/
 /* Print the instruction at given memory address (in MIPS assembly format)    */
 /************************************************************/
-void print_instruction(uint32_t addr){
-	/*IMPLEMENT THIS*/
+void print_instruction(uint32_t addr)
+{
+	uint32_t ins = mem_read_32(addr);
+	uint32_t opcode = (0xFC000000 & ins);
+	switch (opcode)
+	{
+		//R-Type statement
+		case 0x00000000: 
+		{
+			//rs mask
+	        uint32_t rs = (0x03E00000 & ins) >> 21;
+	        //rt mask
+	        uint32_t rt = (0x001F0000 & ins) >> 16;
+	        //rd mask
+	        uint32_t rd = (0x0000F800 & ins) >> 11;
+	        //sa mask
+	        uint32_t sa = (0x000007C0 & ins) >> 6;
+	        //func mask
+	        uint32_t func = (0x0000003F & ins); 
+			switch(func)
+			{
+				//Zach all you
+			}
+		}
+	//I-type statement
+    default :
+        {
+            //rs mask
+            uint32_t rs = (0x03E00000 & ins) >> 21;
+            //rt mask
+            uint32_t rt = (0x001F0000 & ins) >> 16;
+            //im mask
+            uint32_t im = (0x00000FFFF& ins);	   
+            switch (opcode)
+			{
+				case 0x20000000:
+				{
+					//ADDI
+					printf("\nADDI Instruction:\nOpcode: %x \nrs: %x\nrt: %x\nImmediate: %x\n", opcode,rs,rt,im);
+					break;
+				}
+				case 0x24000000:
+				{
+					//ADDIU
+					printf("\nADDIU Instruction:\nOpcode: %x \nrs: %x\nrt: %x\nImmediate: %x\n", opcode,rs,rt,im);
+					break;
+				}
+				case 0x30000000:
+				{
+					//ANDI
+					printf("\nANDI Instruction:\nOpcode: %x \nrs: %x\nrt: %x\nImmediate: %x\n", opcode,rs,rt,im);
+					break;
+				}
+				case 0x34000000:
+				{
+					//ORI
+					printf("\nORI Instruction:\nOpcode: %x \nrs: %x\nrt: %x\nImmediate: %x\n", opcode,rs,rt,im);
+					break;
+				}
+				case 0x38000000:
+				{
+					//XORI
+					printf("\nXORI Instruction:\nOpcode: %x \nrs: %x\nrt: %x\nImmediate: %x\n", opcode,rs,rt,im);
+					break;
+				}
+				case 0x28000000:
+				{
+					//SLTI
+					printf("\nSLTI Instruction:\nOpcode: %x \nrs: %x\nrt: %x\nImmediate: %x\n", opcode,rs,rt,im);
+					break;
+				}
+				case 0x8C000000:
+				{
+					//LW
+					printf("\nLW Instruction:\nOpcode: %x \nrs: %x\nrt: %x\nImmediate: %x\n", opcode,rs,rt,im);
+					break;
+				}
+				case 0x80000000:
+				{
+					//LB
+					printf("\nLB Instruction:\nOpcode: %x \nrs: %x\nrt: %x\nImmediate: %x\n", opcode,rs,rt,im);
+					break;
+				}
+				case 0x84000000:
+				{
+					//LH
+					printf("\nLH Instruction:\nOpcode: %x \nrs: %x\nrt: %x\nImmediate: %x\n", opcode,rs,rt,im);
+					break;
+				}
+				case 0x3C000000:
+				{
+					//LUI
+					printf("\nLUI Instruction:\nOpcode: %x \nrs: %x\nrt: %x\nImmediate: %x\n", opcode,rs,rt,im);
+					break;
+				}
+				case 0xAC000000:
+				{
+					//SW
+					printf("\nSW Instruction:\nOpcode: %x \nrs: %x\nrt: %x\nImmediate: %x\n", opcode,rs,rt,im);
+					break;
+				}
+				case 0xA000000:
+				{
+					//SB
+					printf("\nSB Instruction:\nOpcode: %x \nrs: %x\nrt: %x\nImmediate: %x\n", opcode,rs,rt,im);
+					break;
+				}
+				case 0xA4000000:
+				{
+					//SH
+					printf("\nSH Instruction:\nOpcode: %x \nrs: %x\nrt: %x\nImmediate: %x\n", opcode,rs,rt,im);
+					break;
+				}
+				case 0x10000000:
+				{
+					//BEQ
+					printf("\nBEQ Instruction:\nOpcode: %x \nrs: %x\nrt: %x\nImmediate: %x\n", opcode,rs,rt,im);
+					break;
+				}
+				case 0x14000000:
+				{
+					//BNE
+					printf("\nBNE Instruction:\nOpcode: %x \nrs: %x\nrt: %x\nImmediate: %x\n", opcode,rs,rt,im);
+					break;
+				}
+				case 0x18000000:
+				{
+					//BLEZ
+					printf("\nBLEZ Instruction:\nOpcode: %x \nrs: %x\nrt: %x\nImmediate: %x\n", opcode,rs,rt,im);
+					break;
+				}
+				case 0x1C000000:
+				{
+					//BGTZ
+					printf("\nBGTZ Instruction:\nOpcode: %x \nrs: %x\nrt: %x\nImmediate: %x\n", opcode,rs,rt,im);
+					break;
+				}
+				case 0x04000000:
+				{
+					//REGIMM
+					switch(rt)
+					{
+						case 0x00000000:
+						{
+							//BLTZ
+							printf("\nBLTZ Instruction:\nOpcode: %x \nrs: %x\nrt: %x\nImmediate: %x\n", opcode,rs,rt,im);
+							break;
+						}
+						case 0x00000001:
+						{
+							//BGEZ
+							printf("\nBGEZ Instruction:\nOpcode: %x \nrs: %x\nrt: %x\nImmediate: %x\n", opcode,rs,rt,im);
+							break;
+						}
+						break;
+					}
+				}
+			}
+		}
+	}
 }
 
 /***************************************************************/

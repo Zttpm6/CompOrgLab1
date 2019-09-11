@@ -537,7 +537,7 @@ void handle_instruction()
                     break;
                 }
             }
-			
+			break;
 		}
 				
         //I-type statement
@@ -743,7 +743,7 @@ void handle_instruction()
 			break;
         }
 	}
-	
+	https://github.com/Zttpm6/CompOrgLab1.git
 	NEXT_STATE.PC = CURRENT_STATE.PC + jump;
 }
 
